@@ -47,14 +47,43 @@ See **[WORKFLOW-COMPARISON.md](./WORKFLOW-COMPARISON.md)** for full explanation.
 
 | File | Status | Description |
 |------|--------|-------------|
+| **SeaArt-Character-Pose-Workflow.json** | ✅ **FOR SEAART** | Professional workflow ready to upload to SeaArt |
 | **qwen-optimized-single-pose.json** | ✅ **RECOMMENDED** | Optimized workflow for single pose generation |
+| **generate_18_poses.py** | 🤖 **AUTOMATION** | Python script to auto-generate all 18 poses |
 | **18-POSES-PROMPTS.md** | ✅ **ESSENTIAL** | Prompt templates for all 18 poses |
+| **SEAART-UPLOAD-GUIDE.md** | 📤 **UPLOAD** | Complete guide for uploading to SeaArt |
+| **SEAART-DESCRIPTION.txt** | 📋 **COPY-PASTE** | Ready description for SeaArt upload |
 | **WORKFLOW-COMPARISON.md** | ✅ **READ THIS** | Explains why 18-pose workflow doesn't work + solutions |
 | **Qwen Image Edit 2509.json** | ✅ Works | Original SeaArt workflow |
 | **pose-03-18poses-workflow.json** | ❌ Broken | Uses non-existent custom nodes |
 | **CONFIGURATION.md** | 📖 Reference | Advanced configuration guide |
 | **18-POSES-GUIDE.md** | 📖 Reference | Original concept documentation |
 | **README.md** | 📖 You are here | This file |
+
+---
+
+## 📤 Upload to SeaArt
+
+**Want to share on SeaArt?** Use the professional workflow:
+
+🔗 **Workflow:** `SeaArt-Character-Pose-Workflow.json`
+- Clean layout with grouped nodes
+- Comprehensive documentation
+- Ready to upload
+
+📖 **Upload Guide:** `SEAART-UPLOAD-GUIDE.md`
+- Complete instructions
+- Title, description, tags ready
+- Thumbnail recommendations
+
+📋 **Quick Copy:** `SEAART-DESCRIPTION.txt`
+- Copy-paste ready description
+- All info in one file
+
+**Download:**
+```
+https://raw.githubusercontent.com/khaitrung89/pose-03/claude/nahn65-file-review-019z697KL5iVLMKfRBzJ1LeB/SeaArt-Character-Pose-Workflow.json
+```
 
 ---
 
