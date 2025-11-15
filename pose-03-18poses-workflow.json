@@ -1,0 +1,546 @@
+{
+  "id": "pose-03-18poses-character-sheet",
+  "revision": 1,
+  "last_node_id": 150,
+  "last_link_id": 250,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "Note",
+      "pos": [-500, -800],
+      "size": [1200, 150],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "title": "🎯 18-Pose Character Sheet Generator",
+      "properties": {},
+      "widgets_values": [
+        "Workflow tạo 18 poses character sheet với Qwen-Image-Edit-2509\n- Batch A (10 poses): Full body shots → Grid 3840×2048\n- Batch B (8 poses): Close-ups → Grid 3072×2048\n- Input: 768×1024 | Output: 2 grids optimized"
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [-450, -600],
+      "size": [320, 314],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [100, 101, 102]},
+        {"name": "MASK", "type": "MASK", "links": null}
+      ],
+      "properties": {"Node name for S&R": "LoadImage"},
+      "widgets_values": ["character_reference.png", "image"],
+      "title": "📷 Input Character (768×1024)"
+    },
+    {
+      "id": 20,
+      "type": "SeaArtUnetLoader",
+      "pos": [-450, -200],
+      "size": [315, 82],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [200]}
+      ],
+      "properties": {"Node name for S&R": "SeaArtUnetLoader"},
+      "widgets_values": ["Qwen-Image-Edit-Rapid-AIO", "default"],
+      "title": "🧠 Qwen-Image-Edit-Rapid-AIO"
+    },
+    {
+      "id": 21,
+      "type": "CLIPLoader",
+      "pos": [-450, -50],
+      "size": [315, 82],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "CLIP", "type": "CLIP", "links": [201, 202]}
+      ],
+      "properties": {"Node name for S&R": "CLIPLoader"},
+      "widgets_values": ["qwen_2.5_vl_7b_fp8_scaled.safetensors", "qwen_image", "default"],
+      "title": "🎨 CLIP VL 7B FP8"
+    },
+    {
+      "id": 22,
+      "type": "VAELoader",
+      "pos": [-450, 100],
+      "size": [315, 58],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "VAE", "type": "VAE", "links": [203, 204, 205]}
+      ],
+      "properties": {"Node name for S&R": "VAELoader"},
+      "widgets_values": ["qwen_image_vae.safetensors"],
+      "title": "🔧 Qwen VAE"
+    },
+    {
+      "id": 30,
+      "type": "LoraLoader",
+      "pos": [-100, -200],
+      "size": [315, 126],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 200},
+        {"name": "clip", "type": "CLIP", "link": 201}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [210]},
+        {"name": "CLIP", "type": "CLIP", "links": [211]}
+      ],
+      "properties": {"Node name for S&R": "LoraLoader"},
+      "widgets_values": ["qwen_pose_control_lora.safetensors", 0.85, 0.85],
+      "title": "🎯 LoRA: Pose Control"
+    },
+    {
+      "id": 31,
+      "type": "LoraLoader",
+      "pos": [-100, -50],
+      "size": [315, 126],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 210},
+        {"name": "clip", "type": "CLIP", "link": 211}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [212]},
+        {"name": "CLIP", "type": "CLIP", "links": [213]}
+      ],
+      "properties": {"Node name for S&R": "LoraLoader"},
+      "widgets_values": ["qwen_character_consistency_lora.safetensors", 0.95, 0.95],
+      "title": "👤 LoRA: Character Consistency"
+    },
+    {
+      "id": 32,
+      "type": "LoraLoader",
+      "pos": [-100, 100],
+      "size": [315, 126],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 212},
+        {"name": "clip", "type": "CLIP", "link": 213}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [214, 215]},
+        {"name": "CLIP", "type": "CLIP", "links": [216, 217]}
+      ],
+      "properties": {"Node name for S&R": "LoraLoader"},
+      "widgets_values": ["qwen_multi_angle_lora.safetensors", 0.80, 0.80],
+      "title": "📐 LoRA: Multi-Angle"
+    },
+    {
+      "id": 40,
+      "type": "VAEEncode",
+      "pos": [-100, 300],
+      "size": [210, 46],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {"name": "pixels", "type": "IMAGE", "link": 100},
+        {"name": "vae", "type": "VAE", "link": 203}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [220, 221]}
+      ],
+      "properties": {"Node name for S&R": "VAEEncode"}
+    },
+    {
+      "id": 50,
+      "type": "TextEncodeQwenImageEditPlus",
+      "pos": [250, -400],
+      "size": [450, 200],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 216},
+        {"name": "vae", "type": "VAE", "link": 204},
+        {"name": "image1", "type": "IMAGE", "link": 101}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [230]}
+      ],
+      "properties": {"Node name for S&R": "TextEncodeQwenImageEditPlus"},
+      "widgets_values": [
+        "masterpiece, best quality, ultra detailed, 8k resolution, professional character sheet, consistent character design, same outfit, same hairstyle, same facial features, multiple poses, turnaround reference, clean white background, studio lighting, character reference sheet",
+        [true, true]
+      ],
+      "title": "✅ Positive Prompt (Global)",
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 51,
+      "type": "TextEncodeQwenImageEditPlus",
+      "pos": [250, -150],
+      "size": [450, 200],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 217},
+        {"name": "vae", "type": "VAE", "link": 205},
+        {"name": "image1", "type": "IMAGE", "link": 102}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [231]}
+      ],
+      "properties": {"Node name for S&R": "TextEncodeQwenImageEditPlus"},
+      "widgets_values": [
+        "blurry, low quality, worst quality, jpeg artifacts, ugly, deformed, distorted, duplicate, watermark, text, signature, oversaturated, overexposed, static, unclear details, messy background, three legs, extra fingers, poorly drawn hands, poorly drawn face, malformed limbs, fused fingers, different outfit, different hairstyle, inconsistent character",
+        [true, true]
+      ],
+      "title": "❌ Negative Prompt (Global)",
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 100,
+      "type": "Note",
+      "pos": [750, -500],
+      "size": [900, 100],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "title": "📋 BATCH A - 10 Body Shots (768×1024 each)",
+      "properties": {},
+      "widgets_values": [
+        "1.Full Front | 2.Full Right | 3.Full Left | 4.Full Back | 5.Half Front | 6.Half Back | 7.Half R45° | 8.Half L45° | 9.Half Right | 10.Half Left"
+      ],
+      "color": "#1a5490",
+      "bgcolor": "#2d6ca8"
+    },
+    {
+      "id": 110,
+      "type": "KSampler",
+      "pos": [750, -370],
+      "size": [315, 262],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 214},
+        {"name": "positive", "type": "CONDITIONING", "link": 230},
+        {"name": "negative", "type": "CONDITIONING", "link": 231},
+        {"name": "latent_image", "type": "LATENT", "link": 220}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [240]}
+      ],
+      "properties": {"Node name for S&R": "KSampler"},
+      "widgets_values": [
+        123456,
+        "randomize",
+        30,
+        6.5,
+        "euler_ancestral",
+        "karras",
+        0.70
+      ],
+      "title": "🎲 Sampler Batch A (Body Shots)"
+    },
+    {
+      "id": 111,
+      "type": "LatentBatchSeedBehavior",
+      "pos": [750, -70],
+      "size": [315, 82],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 240}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [241]}
+      ],
+      "properties": {},
+      "widgets_values": ["randomize", 10],
+      "title": "🔄 Batch 10 Variations"
+    },
+    {
+      "id": 112,
+      "type": "VAEDecodeBatch",
+      "pos": [1100, -370],
+      "size": [210, 46],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 241},
+        {"name": "vae", "type": "VAE", "link": 203}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [242]}
+      ],
+      "properties": {"Node name for S&R": "VAEDecodeBatch"}
+    },
+    {
+      "id": 113,
+      "type": "ImageGridComposite",
+      "pos": [1350, -370],
+      "size": [315, 126],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 242}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [243]}
+      ],
+      "properties": {"Node name for S&R": "ImageGridComposite"},
+      "widgets_values": [5, 2, 3840, 2048],
+      "title": "🖼️ Grid A Assembly (5×2 = 3840×2048)"
+    },
+    {
+      "id": 114,
+      "type": "SaveImage",
+      "pos": [1700, -370],
+      "size": [315, 270],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 243}
+      ],
+      "outputs": [],
+      "properties": {"Node name for S&R": "SaveImage"},
+      "widgets_values": ["BatchA_BodyShots_Grid"],
+      "title": "💾 Save Grid A"
+    },
+    {
+      "id": 200,
+      "type": "Note",
+      "pos": [750, 100],
+      "size": [900, 100],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "title": "📋 BATCH B - 8 Close-ups (768×1024 each)",
+      "properties": {},
+      "widgets_values": [
+        "1.Face Front | 2.Face Right | 3.Face Left | 4.Over-Shoulder R | 5.Over-Shoulder L | 6.Top-Down | 7.Bottom-Up | 8.Wide-Angle"
+      ],
+      "color": "#5a1a90",
+      "bgcolor": "#7a2db8"
+    },
+    {
+      "id": 210,
+      "type": "KSampler",
+      "pos": [750, 230],
+      "size": [315, 262],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 215},
+        {"name": "positive", "type": "CONDITIONING", "link": 230},
+        {"name": "negative", "type": "CONDITIONING", "link": 231},
+        {"name": "latent_image", "type": "LATENT", "link": 221}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [250]}
+      ],
+      "properties": {"Node name for S&R": "KSampler"},
+      "widgets_values": [
+        789012,
+        "randomize",
+        30,
+        6.5,
+        "euler_ancestral",
+        "karras",
+        0.65
+      ],
+      "title": "🎲 Sampler Batch B (Close-ups)"
+    },
+    {
+      "id": 211,
+      "type": "LatentBatchSeedBehavior",
+      "pos": [750, 530],
+      "size": [315, 82],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 250}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [251]}
+      ],
+      "properties": {},
+      "widgets_values": ["randomize", 8],
+      "title": "🔄 Batch 8 Variations"
+    },
+    {
+      "id": 212,
+      "type": "VAEDecodeBatch",
+      "pos": [1100, 230],
+      "size": [210, 46],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 251},
+        {"name": "vae", "type": "VAE", "link": 204}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [252]}
+      ],
+      "properties": {"Node name for S&R": "VAEDecodeBatch"}
+    },
+    {
+      "id": 213,
+      "type": "ImageGridComposite",
+      "pos": [1350, 230],
+      "size": [315, 126],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 252}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [253]}
+      ],
+      "properties": {"Node name for S&R": "ImageGridComposite"},
+      "widgets_values": [4, 2, 3072, 2048],
+      "title": "🖼️ Grid B Assembly (4×2 = 3072×2048)"
+    },
+    {
+      "id": 214,
+      "type": "SaveImage",
+      "pos": [1700, 230],
+      "size": [315, 270],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 253}
+      ],
+      "outputs": [],
+      "properties": {"Node name for S&R": "SaveImage"},
+      "widgets_values": ["BatchB_CloseUps_Grid"],
+      "title": "💾 Save Grid B"
+    },
+    {
+      "id": 300,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [250, 100],
+      "size": [280, 60],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 214}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [260]}
+      ],
+      "properties": {"Node name for S&R": "ModelSamplingAuraFlow"},
+      "widgets_values": [3.5],
+      "title": "⚙️ Sampling Optimization"
+    },
+    {
+      "id": 301,
+      "type": "CFGNorm",
+      "pos": [250, 200],
+      "size": [280, 60],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 260}
+      ],
+      "outputs": [
+        {"name": "patched_model", "type": "MODEL", "links": [214, 215]}
+      ],
+      "properties": {"Node name for S&R": "CFGNorm"},
+      "widgets_values": [1.0],
+      "title": "🎚️ CFG Normalization"
+    }
+  ],
+  "links": [
+    [100, 10, 0, 40, 0, "IMAGE"],
+    [101, 10, 0, 50, 2, "IMAGE"],
+    [102, 10, 0, 51, 2, "IMAGE"],
+    [200, 20, 0, 30, 0, "MODEL"],
+    [201, 21, 0, 30, 1, "CLIP"],
+    [202, 21, 0, 51, 0, "CLIP"],
+    [203, 22, 0, 40, 1, "VAE"],
+    [204, 22, 0, 212, 1, "VAE"],
+    [205, 22, 0, 51, 1, "VAE"],
+    [210, 30, 0, 31, 0, "MODEL"],
+    [211, 30, 1, 31, 1, "CLIP"],
+    [212, 31, 0, 32, 0, "MODEL"],
+    [213, 31, 1, 32, 1, "CLIP"],
+    [214, 32, 0, 110, 0, "MODEL"],
+    [215, 32, 0, 210, 0, "MODEL"],
+    [216, 32, 1, 50, 0, "CLIP"],
+    [217, 32, 1, 51, 0, "CLIP"],
+    [220, 40, 0, 110, 3, "LATENT"],
+    [221, 40, 0, 210, 3, "LATENT"],
+    [230, 50, 0, 110, 1, "CONDITIONING"],
+    [231, 51, 0, 110, 2, "CONDITIONING"],
+    [240, 110, 0, 111, 0, "LATENT"],
+    [241, 111, 0, 112, 0, "LATENT"],
+    [242, 112, 0, 113, 0, "IMAGE"],
+    [243, 113, 0, 114, 0, "IMAGE"],
+    [250, 210, 0, 211, 0, "LATENT"],
+    [251, 211, 0, 212, 0, "LATENT"],
+    [252, 212, 0, 213, 0, "IMAGE"],
+    [253, 213, 0, 214, 0, "IMAGE"],
+    [260, 300, 0, 301, 0, "MODEL"]
+  ],
+  "groups": [
+    {
+      "title": "🔧 Base Models & LoRAs",
+      "bounding": [-480, -250, 650, 450],
+      "color": "#3f789e",
+      "locked": false
+    },
+    {
+      "title": "📦 Batch A Pipeline",
+      "bounding": [720, -530, 1320, 680],
+      "color": "#1a5490",
+      "locked": false
+    },
+    {
+      "title": "📦 Batch B Pipeline",
+      "bounding": [720, 70, 1320, 680],
+      "color": "#5a1a90",
+      "locked": false
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.8,
+      "offset": [400, 400]
+    },
+    "workspace_info": {
+      "name": "18-Pose Character Sheet Generator",
+      "version": "1.0.0",
+      "author": "pose-03",
+      "description": "Automated 18-pose character sheet generation with Qwen models"
+    }
+  },
+  "version": 0.4
+}
