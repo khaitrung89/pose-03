@@ -395,10 +395,28 @@ def generate_workflow():
 
         print(f"   ✅ Complete: {pose_name} (5 nodes)")
 
-    # Add workflow links
+    # Add workflow links - properly build from node connections
     workflow["links"] = []
-    for i in range(1, link_id):
-        workflow["links"].append([i, i, 0, i+1, 0, "AUTO"])  # Simplified link structure
+
+    # Helper to extract links from node outputs
+    for node in workflow["nodes"]:
+        if "outputs" in node:
+            for output_idx, output in enumerate(node["outputs"]):
+                if "links" in output and output["links"]:
+                    for link_id_out in output["links"]:
+                        # Find target node that uses this link
+                        for target_node in workflow["nodes"]:
+                            if "inputs" in target_node:
+                                for input_idx, inp in enumerate(target_node["inputs"]):
+                                    if inp.get("link") == link_id_out:
+                                        workflow["links"].append([
+                                            link_id_out,
+                                            node["id"],
+                                            output_idx,
+                                            target_node["id"],
+                                            input_idx,
+                                            output.get("type", "AUTO")
+                                        ])
 
     # Add groups
     workflow["groups"] = [
