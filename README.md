@@ -1,250 +1,286 @@
-# Pose-03: 18-Pose Character Sheet Generator
+# Pose-03: Character Pose Generation with Qwen Models
 
-Automated character sheet generation system using Qwen-Image-Edit models for ComfyUI.
+Optimized workflows for character pose generation using Qwen-Image-Edit models in ComfyUI.
 
-## 🎯 Features
+## ⚠️ Important Notice
 
-- **18 unique poses** in 2 optimized grids
-- **Batch A**: 10 body shots (full & half body) → 3840×2048
-- **Batch B**: 8 close-ups (face & angles) → 3072×2048
-- **LoRA-enhanced** for pose control & character consistency
-- **Optimized sampling** with AuraFlow & CFG normalization
+**The automated 18-pose workflow (`pose-03-18poses-workflow.json`) uses custom nodes that are NOT available in standard ComfyUI and will not work.**
 
-## 📁 Project Files
+**✅ Recommended approach:** Use `qwen-optimized-single-pose.json` and generate 18 poses individually.
 
-| File | Description |
-|------|-------------|
-| `pose-03-18poses-workflow.json` | **Main workflow** - Import to ComfyUI |
-| `18-POSES-GUIDE.md` | **Complete documentation** - Poses, prompts, settings |
-| `Qwen Image Edit 2509.json` | Original Qwen workflow reference |
-| `README.md` | This file |
+See **[WORKFLOW-COMPARISON.md](./WORKFLOW-COMPARISON.md)** for full explanation.
 
-## 🚀 Quick Start
+---
 
-### 1. Install Requirements
+## 🚀 Quick Start (Recommended)
 
-**Models needed:**
-```
-✅ Qwen-Image-Edit-Rapid-AIO (or Qwen-Image-Edit-2509)
-✅ qwen_2.5_vl_7b_fp8_scaled.safetensors
-✅ qwen_image_vae.safetensors
-```
+### **Use:** `qwen-optimized-single-pose.json`
 
-**LoRAs recommended:**
-```
-✅ qwen_pose_control_lora.safetensors
-✅ qwen_character_consistency_lora.safetensors
-✅ qwen_multi_angle_lora.safetensors
-```
+1. **Download workflow:**
+   - `qwen-optimized-single-pose.json`
 
-### 2. Import Workflow
+2. **Import to ComfyUI:**
+   - Drag & drop into ComfyUI interface
 
-1. Open ComfyUI
-2. Drag & drop `pose-03-18poses-workflow.json`
-3. Workflow will auto-load all nodes
+3. **Install required models:**
+   ```
+   ✅ Qwen-Image-Edit-2509-GGUF-Q8_0 (or Rapid-AIO)
+   ✅ qwen_2.5_vl_7b_fp8_scaled.safetensors
+   ✅ qwen_image_vae.safetensors
+   ✅ qwen_character_consistency_lora.safetensors (optional)
+   ```
 
-### 3. Configure Input
+4. **Load character reference image**
+   - Node #38: Load your character (768×1024 recommended)
 
-1. Load your character reference image (768×1024)
-2. Update **Node 10** (LoadImage) with your file
-3. Adjust prompts if needed (optional)
+5. **Generate poses:**
+   - Follow prompts from **[18-POSES-PROMPTS.md](./18-POSES-PROMPTS.md)**
+   - Run 18 times for 18 different poses
 
-### 4. Run Generation
+6. **Create grids:**
+   - Use Photoshop/GIMP/ImageMagick to assemble into grids
+   - See guide in [WORKFLOW-COMPARISON.md](./WORKFLOW-COMPARISON.md)
 
-1. Click **Queue Prompt**
-2. Wait ~5-8 minutes (depends on hardware)
-3. Find outputs in ComfyUI output folder:
-   - `BatchA_BodyShots_Grid_XXXXXX.png`
-   - `BatchB_CloseUps_Grid_XXXXXX.png`
+---
 
-## 📊 Output Examples
+## 📁 Files Overview
 
-### Batch A - Body Shots Grid (3840×2048)
-```
-┌─────────┬─────────┬─────────┬─────────┬─────────┐
-│ Full    │ Full    │ Full    │ Full    │ Half    │
-│ Front   │ Right   │ Left    │ Back    │ Front   │
-├─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Half    │ Half    │ Half    │ Half    │ Half    │
-│ Back    │ R45°    │ L45°    │ Right   │ Left    │
-└─────────┴─────────┴─────────┴─────────┴─────────┘
-```
+| File | Status | Description |
+|------|--------|-------------|
+| **qwen-optimized-single-pose.json** | ✅ **RECOMMENDED** | Optimized workflow for single pose generation |
+| **18-POSES-PROMPTS.md** | ✅ **ESSENTIAL** | Prompt templates for all 18 poses |
+| **WORKFLOW-COMPARISON.md** | ✅ **READ THIS** | Explains why 18-pose workflow doesn't work + solutions |
+| **Qwen Image Edit 2509.json** | ✅ Works | Original SeaArt workflow |
+| **pose-03-18poses-workflow.json** | ❌ Broken | Uses non-existent custom nodes |
+| **CONFIGURATION.md** | 📖 Reference | Advanced configuration guide |
+| **18-POSES-GUIDE.md** | 📖 Reference | Original concept documentation |
+| **README.md** | 📖 You are here | This file |
 
-### Batch B - Close-ups Grid (3072×2048)
-```
-┌─────────┬─────────┬─────────┬─────────┐
-│ Face    │ Face    │ Face    │ Over-   │
-│ Front   │ Right   │ Left    │ Shldr R │
-├─────────┼─────────┼─────────┼─────────┤
-│ Over-   │ Top-    │ Bottom- │ Wide    │
-│ Shldr L │ Down    │ Up      │ Angle   │
-└─────────┴─────────┴─────────┴─────────┘
-```
+---
 
-## 🔧 Configuration
+## 🎯 What Changed from Original Workflow?
 
-### Sampling Parameters (Optimized)
+### ✅ **Optimized Workflow Improvements:**
 
-**Batch A (Body Shots):**
-- Steps: 30
-- CFG: 6.5
-- Denoise: 0.70
-- Sampler: euler_ancestral
+| Parameter | Original | Optimized | Impact |
+|-----------|----------|-----------|--------|
+| **Denoise** | 1.0 | **0.70** | Better editing, preserves character |
+| **CFG** | 2.5 | **6.5** | Stronger prompt adherence |
+| **Steps** | 20 | **30** | Higher quality output |
+| **Negative** | Chinese | **English** | Easier to customize |
+| **LoRA** | None | **Optional** | Better character consistency |
+| **AuraFlow** | 3.0 | **3.5** | Improved sampling |
 
-**Batch B (Close-ups):**
-- Steps: 30
-- CFG: 6.5
-- Denoise: 0.65 (lower for facial detail preservation)
-- Sampler: euler_ancestral
+**Result:** Significantly better quality and character consistency.
 
-### LoRA Strengths
+---
 
-```
-Pose Control:           0.85
-Character Consistency:  0.95
-Multi-Angle:           0.80
-```
+## 🎨 18 Poses Breakdown
 
-## 📖 Documentation
-
-See **[18-POSES-GUIDE.md](./18-POSES-GUIDE.md)** for:
-- Complete pose definitions
-- Detailed prompt templates
-- Troubleshooting guide
-- Advanced customization
-- Quality checklist
-
-## 🎨 Workflow Architecture
-
-```
-Input Image (768×1024)
-    ↓
-Base Models (Qwen-Image-Edit-Rapid-AIO + CLIP + VAE)
-    ↓
-LoRA Stack (Pose + Consistency + Multi-Angle)
-    ↓
-Optimization (AuraFlow + CFG Norm)
-    ↓
-    ├─→ Batch A Pipeline → Grid A (3840×2048)
-    └─→ Batch B Pipeline → Grid B (3072×2048)
-```
-
-## 🎯 18 Poses Breakdown
-
-### Batch A (10 poses):
+### Batch A (10 poses) - Body Shots
 1. Full Front
 2. Full Right (90°)
 3. Full Left (90°)
 4. Full Back
-5. Half Front
-6. Half Back
-7. Half R45°
-8. Half L45°
+5. Half Front (waist up)
+6. Half Back (waist up)
+7. Half Right 45°
+8. Half Left 45°
 9. Half Right (90°)
 10. Half Left (90°)
 
-### Batch B (8 poses):
+### Batch B (8 poses) - Close-ups
 1. Face Front
-2. Face Right
-3. Face Left
+2. Face Right Profile
+3. Face Left Profile
 4. Over-Shoulder Right
 5. Over-Shoulder Left
-6. Top-Down
-7. Bottom-Up
-8. Wide-Angle
+6. Top-Down Angle
+7. Bottom-Up Angle
+8. Wide-Angle Portrait
 
-## 💡 Tips
+**See [18-POSES-PROMPTS.md](./18-POSES-PROMPTS.md) for exact prompts.**
 
-**For best results:**
-- Use clean, high-quality reference image (768×1024 minimum)
-- Keep character description detailed in prompts
-- Don't modify LoRA loading order
-- Monitor VRAM usage (reduce steps if needed)
-- Use fixed seed for reproducible results
+---
 
-**Common adjustments:**
-- **More consistency**: Increase character_consistency_lora to 1.0
-- **Better poses**: Increase pose_control_lora to 0.90
-- **Clearer angles**: Increase multi_angle_lora to 0.85
-- **Faster generation**: Reduce steps to 20-25
+## ⚙️ Workflow Parameters
+
+### Optimized Settings (Node #72 - KSampler):
+```yaml
+Seed: randomize (or fixed for consistency)
+Steps: 30
+CFG: 6.5
+Sampler: euler_ancestral
+Scheduler: karras
+Denoise: 0.70
+```
+
+### LoRA Settings (Node #82 - Optional):
+```yaml
+LoRA: qwen_character_consistency_lora.safetensors
+Model Strength: 0.85
+CLIP Strength: 0.85
+```
+
+**Note:** If LoRA file not available, you can disable Node #82 by:
+- Right-click → Bypass
+- Or delete the node and reconnect Model/CLIP links
+
+---
+
+## 📊 Performance Estimates
+
+| Hardware | Time per Pose | 18 Poses | Grid Creation | Total |
+|----------|---------------|----------|---------------|-------|
+| RTX 3060 12GB | ~20s | ~6 min | 1-2 min | ~8 min |
+| RTX 4090 24GB | ~10s | ~3 min | 1-2 min | ~5 min |
+| RTX 4070 Ti 12GB | ~15s | ~4.5 min | 1-2 min | ~7 min |
+
+---
+
+## 🔧 Creating Final Grids
+
+### Option 1: ImageMagick (Command Line)
+```bash
+# Install ImageMagick first
+# Then run:
+
+# Batch A Grid (5×2)
+montage A{1..10}.png -tile 5x2 -geometry 768x1024+0+0 -background white BatchA_Grid.png
+
+# Batch B Grid (4×2)
+montage B{1..8}.png -tile 4x2 -geometry 768x1024+0+0 -background white BatchB_Grid.png
+```
+
+### Option 2: Photoshop/GIMP
+1. Create canvas: 3840×2048 (Batch A) or 3072×2048 (Batch B)
+2. Place images in grid: each cell 768×1024
+3. Export as PNG
+
+### Option 3: Python Script
+See [WORKFLOW-COMPARISON.md](./WORKFLOW-COMPARISON.md) for Python code.
+
+---
+
+## 💡 Tips for Best Results
+
+### For Character Consistency:
+1. **Use fixed seed** (e.g., 123456) in KSampler
+2. **Enable LoRA** with strength 0.85-0.95
+3. **Add detailed character description** to all prompts
+4. **Use same input image** for all 18 poses
+
+### For Quality:
+1. **High-res input** (768×1024 minimum)
+2. **Clean background** in reference image
+3. **Increase steps** to 35-40 if needed
+4. **Adjust denoise** (0.65 for more detail preservation)
+
+### For Speed:
+1. **Reduce steps** to 20-25
+2. **Use sampler** `euler` instead of `euler_ancestral`
+3. **Lower denoise** to 0.65
+
+---
 
 ## 🛠️ System Requirements
 
 **Minimum:**
 - GPU: 8GB VRAM
 - RAM: 16GB
-- Storage: 20GB free (for models)
+- Storage: 20GB (for models)
+- ComfyUI with SeaArt nodes
 
 **Recommended:**
-- GPU: 12GB+ VRAM (RTX 3060 12GB or better)
+- GPU: 12GB+ VRAM
 - RAM: 32GB
 - Storage: SSD with 50GB+ free
+- Latest ComfyUI version
 
-## 📊 Performance
+---
 
-| Hardware | Batch A | Batch B | Total Time |
-|----------|---------|---------|------------|
-| RTX 3060 12GB | ~3 min | ~2 min | ~5 min |
-| RTX 4090 24GB | ~90 sec | ~60 sec | ~2.5 min |
-| RTX 4070 Ti 12GB | ~2 min | ~90 sec | ~3.5 min |
+## 📖 Documentation Guide
 
-*Times are approximate and vary based on settings*
+**Start here:**
+1. **README.md** (this file) - Overview
+2. **WORKFLOW-COMPARISON.md** - Why 18-pose workflow doesn't work + solutions
+3. **18-POSES-PROMPTS.md** - Copy-paste prompts for all 18 poses
 
-## 🔄 Comparison with Original
+**Advanced:**
+4. **CONFIGURATION.md** - Detailed parameter tuning
+5. **18-POSES-GUIDE.md** - Original concept documentation
 
-| Feature | Original (Qwen Image Edit 2509.json) | This Workflow (pose-03-18poses) |
-|---------|--------------------------------------|----------------------------------|
-| **Poses** | 1 single output | 18 poses in 2 grids |
-| **LoRA** | ❌ None | ✅ 3 LoRAs (pose/consistency/angle) |
-| **Batch** | Single image | Dual batch (10+8) |
-| **Denoise** | 1.0 (full generation) | 0.70/0.65 (editing mode) |
-| **CFG** | 2.5 (very low) | 6.5 (balanced) |
-| **Steps** | 20 | 30 |
-| **Output** | 1 image | 2 grids (optimized layouts) |
-| **Purpose** | General image editing | Character sheet creation |
+---
 
-## 🚨 Troubleshooting
+## ❓ FAQ
 
-**Problem: Character looks different across poses**
-→ Increase `character_consistency_lora` strength to 1.0
+**Q: Why doesn't the 18-pose workflow work?**
+A: It uses custom nodes (`VAEDecodeBatch`, `LatentBatchSeedBehavior`, `ImageGridComposite`) that don't exist in ComfyUI. See [WORKFLOW-COMPARISON.md](./WORKFLOW-COMPARISON.md).
 
-**Problem: Poses are not accurate**
-→ Increase `pose_control_lora` strength to 0.90+
+**Q: How do I generate 18 poses then?**
+A: Use `qwen-optimized-single-pose.json` and run it 18 times with different prompts from [18-POSES-PROMPTS.md](./18-POSES-PROMPTS.md).
 
-**Problem: VRAM out of memory**
-→ Reduce steps to 20, or disable one batch and run separately
+**Q: Do I need LoRA files?**
+A: No, they're optional. The workflow works without them, but LoRAs improve character consistency.
 
-**Problem: Generation too slow**
-→ Use "euler" sampler instead of "euler_ancestral"
+**Q: Can I use this with standard Qwen models (not SeaArt)?**
+A: The workflow uses SeaArt's `TextEncodeQwenImageEditPlus` node. For standard ComfyUI, you'd need to replace with `CLIPTextEncode`.
 
-**Problem: Blurry faces in Batch B**
-→ Reduce Batch B denoise to 0.60, increase CFG to 7.0
+**Q: How do I ensure character consistency?**
+A: Use fixed seed + LoRA + detailed character description in ALL prompts.
 
-See **18-POSES-GUIDE.md** for complete troubleshooting guide.
+**Q: Can I automate the 18 poses?**
+A: Not directly in ComfyUI without custom nodes. But you can script it externally (e.g., Python API to ComfyUI).
 
-## 📝 Notes
-
-- **LoRA files must be compatible** with Qwen models
-- If LoRAs unavailable, workflow can run with base model only (lower quality)
-- Input image quality directly affects output quality
-- Background should be clean/simple for best results
+---
 
 ## 🤝 Credits
 
 - **Models**: Qwen-Image-Edit series (Alibaba/SeaArt)
 - **Framework**: ComfyUI
-- **Workflow Design**: pose-03 project
-- **Version**: 1.0.0
-
-## 📜 License
-
-This workflow is provided as-is for personal and commercial use.
-Model licenses follow their respective terms (Qwen models, LoRAs, etc.)
+- **Original Workflow**: SeaArt
+- **Optimization**: pose-03 project
 
 ---
 
-**For detailed documentation, see [18-POSES-GUIDE.md](./18-POSES-GUIDE.md)**
+## 📝 Quick Reference
 
-**Questions or issues?** Check the troubleshooting section in the guide or review your node connections.
+**Recommended Workflow:**
+```
+qwen-optimized-single-pose.json
+```
 
-*Last updated: 2025-11-15*
+**Prompt Guide:**
+```
+18-POSES-PROMPTS.md
+```
+
+**Troubleshooting:**
+```
+WORKFLOW-COMPARISON.md
+```
+
+**Download Links:**
+- Workflow: `https://github.com/khaitrung89/pose-03/blob/main/qwen-optimized-single-pose.json`
+- Prompts: `https://github.com/khaitrung89/pose-03/blob/main/18-POSES-PROMPTS.md`
+
+---
+
+## 🚨 Common Issues
+
+**"Node is missing class_type property"**
+→ You're trying to load `pose-03-18poses-workflow.json`. Use `qwen-optimized-single-pose.json` instead.
+
+**"Character looks different in each pose"**
+→ Use **fixed seed** and **LoRA**. Add detailed character description to prompts.
+
+**"Background is messy"**
+→ Add to negative prompt: `complex background, detailed background, scenery`
+
+**"Generation too slow"**
+→ Reduce steps to 20-25, use `euler` sampler.
+
+---
+
+**Last updated: 2025-11-15**
+**Version: 2.0 (Fixed)**
